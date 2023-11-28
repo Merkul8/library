@@ -44,6 +44,7 @@ def register(request):
 
 # view главной страницы
 def main(request):
+    # Исправлена ошибка в этом месте
     books = Book.objects.all()
     return render(request, 'books/main.html', context={'books': books})
 
