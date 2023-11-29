@@ -1,62 +1,13 @@
 Доброго времени суток!
-Приложение запускается при помощи Docker. Для начала нужно создать Dockerfile и затем docke-compose.yml.
+Приложение запускается при помощи Docker. Dockerfile и docker-compose.yml полностью сформированы.
 
-Dockerfile:
-FROM python:3.9.13
+Чтобы запустить приложение нужно выполнить две команды из корневой директории:
 
-COPY requirements.txt /temp/requirements.txt
-COPY . /library
-WORKDIR /library
-
-EXPOSE 8000
-
-RUN apt-get update && apt-get install -y postgresql-client build-essential postgresql-server-dev-all
-
-RUN pip install -r /temp/requirements.txt
-
-RUN adduser --disabled-password library-user
-
-USER library-user
-
-docker-compose.yml:
-services:
-  web: 
-    build:
-      context: .
-    ports:
-      - "8000:8000"
-    volumes:
-      - ./library:/library
-    environment:
-      - DB_HOST=db
-      - DB_NAME=db01
-      - DB_USER=merkul
-      - DB_PASS=merkul12
-      - CELERY_BROKER_URL=redis://redis:6379/0
-    command: >
-      sh -c "python manage.py runserver 0.0.0.0:8000"
-    depends_on:
-      - db
-      - redis
-      - celery
-
-  db:
-    image: postgres:13
-    environment:
-      - POSTGRES_DB=db01
-      - POSTGRES_USER=merkul
-      - POSTGRES_PASSWORD=merkul12
-  redis:
-    image: redis:latest
-
-  celery:
-    build:
-      context: .
-    command: celery -A library worker -l info
-    volumes:
-      - ./library:/library
-    depends_on:
-      - redis
-
-Далее нужно выполнить две команды в корневой директории :
 1) docker-compose build
+
+2) docker-compose up
+
+Затем выполните миграции "docker exec -it имя_вашего_контейнера python manage.py migrate".
+
+Приложение готово к работе.
+
