@@ -34,6 +34,7 @@ def register(request):
             login(request, user)
             messages.success(request, 'Успешная регистрация')
             Person.objects.create(name=form.cleaned_data['username'], email=form.cleaned_data['email'])
+            # Запуск задачи celery
             send_test_message.delay(form.cleaned_data['email'])
             return redirect('home')
         else:
